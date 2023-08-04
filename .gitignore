@@ -1,0 +1,8 @@
+*.spec
+*.html
+*.log
+*.xlsx
+taobao_bought_order_list/
+env/
+build/
+dist/
