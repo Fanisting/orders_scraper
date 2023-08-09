@@ -1,4 +1,5 @@
 *.spec
+*.js
 *.html
 *.log
 *.xlsx
