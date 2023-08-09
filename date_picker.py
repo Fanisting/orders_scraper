@@ -24,15 +24,15 @@ def pick_dates():
         if start > stop:
             messagebox.showerror("错误", "确保开始日期早于结束日期")
         else:
-            start_date = start
-            end_date = stop
+            start_date = start.strftime('%Y-%m-%d')
+            end_date = stop.strftime('%Y-%m-%d')
             print(f'开始日期：{start_date}\n结束日期：{end_date}')
             root.destroy()  # Close the tkinter window
 
-    date1 = tkcalendar.DateEntry(root)
+    date1 = tkcalendar.DateEntry(root, locale="zh_CN")
     date1.pack(padx=10, pady=10)
 
-    date2 = tkcalendar.DateEntry(root)
+    date2 = tkcalendar.DateEntry(root, locale="zh_CN")
     date2.pack(padx=10, pady=10)
 
     Button(root, text='查询范围', command=lambda: date_range(date1.get_date(), date2.get_date())).pack()

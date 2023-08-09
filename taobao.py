@@ -27,7 +27,7 @@ def setup_logger(log_file):
 
     return logger
 
-def main():
+def taobao():
     # Initialize the logger
     current_date = datetime.now().strftime('%Y-%m-%d')
     logger = setup_logger(f'taobao_{current_date}.log')
@@ -89,79 +89,79 @@ def main():
                 with open(output_html, "w", encoding="utf-8") as file:
                     file.write(html_content)
             
-            # # Find more-functions button and click
+            # Find more-functions button and click
 
-            # # Click on the input element to open the calendar
-            # page.locator('button.search-mod__more-button___nbIba').click()
-            # page.wait_for_selector('[data-reactid=".0.2.1.0.1.1"]', state="visible")
-            # # Click start date
-            # page.locator('[data-reactid=".0.2.1.0.1.1"]').click()
-            # page.wait_for_selector('a.rc-calendar-month-select', state="visible")
-            # # Click start date in calendar
-            # page.locator('a.rc-calendar-month-select').click() # months
-            # page.wait_for_selector('div.rc-calendar-month-panel', state="visible")
+            # Click on the input element to open the calendar
+            page.locator('button.search-mod__more-button___nbIba').click()
+            page.wait_for_selector('[data-reactid=".0.2.1.0.1.1"]', state="visible")
+            # Click start date
+            page.locator('[data-reactid=".0.2.1.0.1.1"]').click()
+            page.wait_for_selector('a.rc-calendar-month-select', state="visible")
+            # Click start date in calendar
+            page.locator('a.rc-calendar-month-select').click() # months
+            page.wait_for_selector('div.rc-calendar-month-panel', state="visible")
 
-            # # Now, let's say you want to select the date '2023-08-10'.
-            # # You can construct the selector dynamically based on the desired date.
-            # date_to_select = '2023-01-10'
-            # year, month, day = date_to_select.split('-')
-            # month_dict = {
-            #     1: "一月",
-            #     2: "二月",
-            #     3: "三月",
-            #     4: "四月",
-            #     5: "五月",
-            #     6: "六月",
-            #     7: "七月",
-            #     8: "八月",
-            #     9: "九月",
-            #     10: "十月",
-            #     11: "十一月",
-            #     12: "十二月"
-            # }
-            # month_selector = f'[title="{month_dict[int(month)]}"]'
-            # page.locator(month_selector).click()
-            # page.wait_for_selector('div.rc-calendar-calendar-body', state="visible")
+            # Now, let's say you want to select the date '2023-08-10'.
+            # You can construct the selector dynamically based on the desired date.
+            date_to_select = start_date
+            year, month, day = date_to_select.split('-')
+            month_dict = {
+                1: "一月",
+                2: "二月",
+                3: "三月",
+                4: "四月",
+                5: "五月",
+                6: "六月",
+                7: "七月",
+                8: "八月",
+                9: "九月",
+                10: "十月",
+                11: "十一月",
+                12: "十二月"
+            }
+            month_selector = f'[title="{month_dict[int(month)]}"]'
+            page.locator(month_selector).click()
+            page.wait_for_selector('div.rc-calendar-calendar-body', state="visible")
 
-            # # Select the date
-            # date_selector = f'td[title="{int(year)}-{int(month)}-{int(day)}"]'
-            # page.locator(date_selector).click()
-            # page.wait_for_selector('a.rc-calendar-ok-btn', state="visible")
-            # page.locator('a.rc-calendar-ok-btn').click()
+            # Select the date
+            date_selector = f'td[title="{int(year)}-{int(month)}-{int(day)}"]'
+            page.locator(date_selector).click()
+            page.wait_for_selector('a.rc-calendar-ok-btn', state="visible")
+            page.locator('a.rc-calendar-ok-btn').click()
 
-            # time.sleep(5)
+            time.sleep(2)
 
-            # date_to_select_end = '2023-08-01'
-            # year, month, day = date_to_select_end.split('-')            
+            date_to_select_end = end_date
+            year, month, day = date_to_select_end.split('-')            
 
-            # page.wait_for_selector('[data-reactid=".0.2.1.0.1.3"]', state="visible")
-            # # Click start date
-            # page.locator('[data-reactid=".0.2.1.0.1.3"]').click()
-            # page.wait_for_selector('a.rc-calendar-month-select', state="visible")
-            # # Click start date in calendar
-            # page.locator('a.rc-calendar-month-select').click() # months
-            # page.wait_for_selector('div.rc-calendar-month-panel', state="visible")
+            page.wait_for_selector('[data-reactid=".0.2.1.0.1.3"]', state="visible")
+            # Click start date
+            page.locator('[data-reactid=".0.2.1.0.1.3"]').click()
+            page.wait_for_selector('a.rc-calendar-month-select', state="visible")
+            # Click start date in calendar
+            page.locator('a.rc-calendar-month-select').click() # months
+            page.wait_for_selector('div.rc-calendar-month-panel', state="visible")
 
-            # month_selector = f'[title="{month_dict[int(month)]}"]'
-            # page.locator(month_selector).click()
-            # page.wait_for_selector('div.rc-calendar-calendar-body', state="visible")
+            month_selector = f'[title="{month_dict[int(month)]}"]'
+            page.locator(month_selector).click()
+            page.wait_for_selector('div.rc-calendar-calendar-body', state="visible")
 
-            # # Select the date
-            # date_selector = f'td[title="{int(year)}-{int(month)}-{int(day)}"]'
-            # page.locator(date_selector).click()
-            # page.wait_for_selector('a.rc-calendar-ok-btn', state="visible")
-            # page.locator('a.rc-calendar-ok-btn').click()
+            # Select the date
+            date_selector = f'td[title="{int(year)}-{int(month)}-{int(day)}"]'
+            page.locator(date_selector).click()
+            page.wait_for_selector('a.rc-calendar-ok-btn', state="visible")
+            page.locator('a.rc-calendar-ok-btn').click()
 
             # Click search
-            # time.sleep(2)
-            # search_button_selector = 'button.button-mod__primary___1tmFA'
-            # print(f"==>> search_button_selector: {search_button_selector}")
-            # page.wait_for_selector(search_button_selector, state="visible")
-            # print(f"==>> search_button_selector find: {search_button_selector}")
-            # page.locator(search_button_selector).click()
-            # print(f"==>> search_button_selector click: {search_button_selector}")
+            time.sleep(2)
+            search_button_selector = 'button.button-mod__primary___1tmFA'
+            print(f"==>> search_button_selector: {search_button_selector}")
+            page.wait_for_selector(search_button_selector, state="visible")
+            print(f"==>> search_button_selector find: {search_button_selector}")
+            page.locator(search_button_selector).click()
+            print(f"==>> search_button_selector click: {search_button_selector}")
 
-            # time.sleep(10)
+            time.sleep(3)
 
             results = page.query_selector_all('.pagination-item')
             results_num = len(results)
@@ -236,5 +236,5 @@ def main():
             messagebox.showinfo("出现错误", f"{str(e)}")
             root.destroy()  # 销毁弹窗
     
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

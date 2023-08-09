@@ -6,3 +6,4 @@ taobao_bought_order_list/
 env/
 build/
 dist/
+__pycache__/
