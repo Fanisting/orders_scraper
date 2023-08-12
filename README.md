@@ -28,16 +28,25 @@ Here we should set up more in playwright, run this in terminal:
 playwright install
 ```
 
-## Pyinstaller
+## Make your own app with Pyinstaller
 
-After activate `venv` in terminal, run this in terminal:
-```
+After activate `venv` in terminal, run command to compile the app/exe in terminal.
+
+### Windows
+
+```powershell
+# powershell
 $env:PLAYWRIGHT_BROWSERS_PATH="0" 
 playwright install chromium
-pyinstaller -n choose -F --noconsole choose.py
+pyinstaller -n choose -F --windowed choose.py
 ```
 
-## Test it
+### Mac OS
+
+```bash
+PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+pyinstaller -n choose -F --windowed choose.py
+```
 
 You will find the compiled app in `dist/` folder, try to run it. 
 
