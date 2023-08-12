@@ -25,7 +25,13 @@ def setup_logger(log_file):
 
     return logger
 
-
+def date_string_to_int(date_str):
+    # Assuming date_str has the format "YYYY-MM-DD"
+    components = date_str.split("-")
+    year = int(components[0][2:])
+    month = int(components[1])
+    day = int(components[2])
+    return year * 10000 + month * 100 + day
 
 def pdd(start_date, end_date):
     # Initialize the logger
@@ -38,7 +44,12 @@ def pdd(start_date, end_date):
     def store_json(t):
         with open(output_json, "a", encoding="utf-8") as file:
             file.write("---\n")
-            file.write(str(t))
+            file.write(f'{str(t)}\n')
+
+    # Init the txt file
+    # this code ensure start with an empty file
+    with open(output_json, "w", encoding="utf-8") as file:
+        pass
     
     logger.info('Starting the program')
     store_json(f'date_range: {start_date} - {end_date}')
@@ -52,7 +63,12 @@ def pdd(start_date, end_date):
 
         # Main program
         try:
-            date_range = [start_date, end_date]
+            # make start_date and end_date be int
+            # From "2023-01-01"
+            # To integer 230101
+            # The int format follows pdd order pattern
+            date_range = [date_string_to_int(start_date), date_string_to_int(end_date)]
+
             # Attach an event listener to the response event
             def handle_response(response):
                 url = response.url
@@ -69,15 +85,15 @@ def pdd(start_date, end_date):
                         # have multiple orders
                         order_list = json_data["orders"]
                         new_order = int(order_list[0]['order_sn'].split("-")[0])
-                        print(f"==>> new_order: {new_order}")
                         old_order = int(order_list[-1]['order_sn'].split("-")[0])
+                        print(f"==>> new_order: {new_order}")
                         print(f"==>> old_order: {old_order}")
                         if date_range[0] > new_order:
                             # date range not matched
                             stop_event.set()
                             print("stop listening since date range not matched")
                         else:
-                            store_json(f'{url}\n')
+                            store_json(f'api_json')
                             store_json(json_data)
 
             # Step 0: Show Instructions
@@ -162,7 +178,7 @@ def pdd(start_date, end_date):
             order_10 = page.evaluate("window.rawData")
             orders = parse_order(order_10)
             print(f"==>> orders: {orders}")
-            store_json("top ten json\n")
+            store_json("top ten json")
             store_json(orders)
 
         
@@ -175,16 +191,13 @@ def pdd(start_date, end_date):
 
             page.on("response", handle_response)
             print("start listening")
-            page.reload()
+            page.reload(wait_until="domcontentloaded")
             page.wait_for_selector('._13OAwPyA', state="visible")
 
             while not stop_event.is_set():
                 down()
-                time.sleep(3)
+                time.sleep(0.5) # gap between scroll down
             
-                
-                
-                
             # Auto Scroll down to Bottom
             # page.evaluate(
             #     """
