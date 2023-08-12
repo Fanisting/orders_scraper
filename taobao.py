@@ -1,13 +1,8 @@
 from playwright.sync_api import sync_playwright
-from pathlib import Path
 import time
-import os
 import sys
 from datetime import datetime
 import logging
-import tkinter as tk
-from tkinter import messagebox
-from date_picker import pick_dates
 
 def setup_logger(log_file):
     # Create a logger
@@ -27,71 +22,87 @@ def setup_logger(log_file):
 
     return logger
 
-def taobao():
+def taobao(start_date, end_date):
+
     # Initialize the logger
     current_date = datetime.now().strftime('%Y-%m-%d')
     logger = setup_logger(f'taobao_{current_date}.log')
 
-    # Date management
-    # determine whether to scrape next-page
-    try:
-        # select date range in calendar
-        start_date, end_date = pick_dates()
-        root = tk.Tk()
-        root.withdraw()  # 隐藏主窗口，只显示弹窗
-        root.attributes("-topmost", True)
-        messagebox.showinfo("日期选择结果", f"开始日期：{start_date}\n结束日期：{end_date}")
-        logger.info(f'chosen date range: {start_date} - {end_date}')
-    except Exception as e:
-        logger.info(f'{str(e)}')
-        root = tk.Tk()
-        root.withdraw()  # 隐藏主窗口，只显示弹窗
-        root.attributes("-topmost", True)
-        messagebox.showinfo("错误", "日期有误!")
-        root.destroy()
-
+    logger.info('Starting the program')
     # Main program
-    try:
-        logger.info('Starting the program')
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
-            context = browser.new_context()
-            page = context.new_page()
+    
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context()
+        page = context.new_page()
+        logger.info('Create the page')
 
-            # set default timeout
-            page.set_default_timeout(120000)
+        # set default timeout
+        page.set_default_timeout(120000)
+        logger.info('Set default timeout')
+
+        try:
+            # Step 0: Show Instructions
+            # Inject a styled message box into the page
+            message_js_code = """
+            () => {
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div id="customAlert1" style="
+                        position: fixed;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        padding: 20px;
+                        background-color: white;
+                        border: 2px solid black;
+                        z-index: 10000;
+                        display: none;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <h2>开始自动化操作</h2>
+                        <p>我们将自动为您打开淘宝的登录界面，请打开您手机上的淘宝软件，并使用软件内部的扫码功能来登录您的账号!</p>
+                        <p>如果您理解了这一步操作，请点击下方的确定按钮。</p>
+                        <center>
+                        <button onclick="document.getElementById('customAlert1').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
+                        style="
+                            padding: 10px 20px;
+                            font-size: 15px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        "
+                        > 确定 </button>
+                        </center>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            """
+            page.evaluate(message_js_code)
+            page.evaluate("document.getElementById('customAlert1').style.display='block'")
+            # Wait for the 'alertClosed' attribute to appear on the body element
+            page.wait_for_selector("body[alertClosed='true']")
+            logger.info('Show instructions')
 
             # Step 1: Open the link and login
-            # pop up message
-            root = tk.Tk()
-            root.withdraw()  # 隐藏主窗口，只显示弹窗
-            root.attributes("-topmost", True)
-            messagebox.showinfo("开始操作", "我们将自动为您打开淘宝网页，请扫码登录您的淘宝账号!")
-            root.destroy()
-            logger.info('Showed message popup')
             # open link and wait until page loaded
             page.goto('https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm')
-            page.wait_for_load_state()
+            # page.wait_for_selector("i.icon-qrcode", state="visible")
+            # page.locator("i.icon-qrcode").click()
             logger.info('Login page already loaded')
 
             # Step 2: Wait for login
             page.wait_for_selector('#bought', state="visible")
             page.wait_for_load_state("domcontentloaded")
             logger.info('Bought items page already loaded')
-
-            def generate_html_file(id):
-                element = page.locator('div[id="tp-bought-root"]')
-                html_content = element.inner_html()
-                output_dir = Path(sys.executable).parent
-                output_folder = output_dir / "输出"
-                output_folder.mkdir(exist_ok=True)
-                output_html = output_folder / f"taobao_{current_date}_{id}.html"
-                with open(output_html, "w", encoding="utf-8") as file:
-                    file.write(html_content)
             
             # Find more-functions button and click
 
             # Click on the input element to open the calendar
+            page.wait_for_selector("button.search-mod__more-button___nbIba", state="visible")
             page.locator('button.search-mod__more-button___nbIba').click()
             page.wait_for_selector('[data-reactid=".0.2.1.0.1.1"]', state="visible")
             # Click start date
@@ -100,6 +111,7 @@ def taobao():
             # Click start date in calendar
             page.locator('a.rc-calendar-month-select').click() # months
             page.wait_for_selector('div.rc-calendar-month-panel', state="visible")
+            logger.info('Chose the calendar')
 
             # Now, let's say you want to select the date '2023-08-10'.
             # You can construct the selector dynamically based on the desired date.
@@ -122,12 +134,14 @@ def taobao():
             month_selector = f'[title="{month_dict[int(month)]}"]'
             page.locator(month_selector).click()
             page.wait_for_selector('div.rc-calendar-calendar-body', state="visible")
+            logger.info('Chose the month')
 
             # Select the date
             date_selector = f'td[title="{int(year)}-{int(month)}-{int(day)}"]'
             page.locator(date_selector).click()
             page.wait_for_selector('a.rc-calendar-ok-btn', state="visible")
             page.locator('a.rc-calendar-ok-btn').click()
+            logger.info(f'Chose the start date: {start_date}')
 
             time.sleep(2)
 
@@ -151,6 +165,7 @@ def taobao():
             page.locator(date_selector).click()
             page.wait_for_selector('a.rc-calendar-ok-btn', state="visible")
             page.locator('a.rc-calendar-ok-btn').click()
+            logger.info(f'Chose the end date: {end_date}')
 
             # Click search
             time.sleep(2)
@@ -194,6 +209,7 @@ def taobao():
                 html_content = element.inner_html()
                 file.write(html_content)            
             with open(output_html, "w", encoding="utf-8") as file:
+                file.write(f"date range: {start_date} - {end_date}\n")  
                 if results_num == 1:
                     print("only one page detected")
                     logger.info(f'only one page detected')
@@ -211,30 +227,101 @@ def taobao():
                     file.write(f"Page {results_num}\n")
                     store_html()
                     logger.info(f'Finished writing page {results_num}')
-                    # generate_html_file(results_num)
-                
-            context.close()
-            browser.close()
-            logger.info('Closed the browser')
 
-            
-
-            root = tk.Tk()
-            root.withdraw()  # 隐藏主窗口，只显示弹窗
-            root.attributes("-topmost", True)
-            messagebox.showinfo("完成", "数据已经收集完毕!")
-            root.destroy()
-            logger.info('Showed finished message')
-
-        logger.info('Completed successfully')
-    except Exception as e:
+            # Show Finished messages
+            # Inject a styled message box into the page
+            message_js_code = """
+            () => {
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div id="customAlert2" style="
+                        position: fixed;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        padding: 20px;
+                        background-color: white;
+                        border: 2px solid black;
+                        z-index: 10000;
+                        display: none;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 15px;
+                    ">
+                        <h2>结束程序</h2>
+                        <p>数据收集完成，感谢您的使用！如果要收集其他平台的数据，请重新打开软件</p>
+                        <center>
+                        <button onclick="document.getElementById('customAlert2').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
+                        style="
+                            padding: 10px 20px;
+                            font-size: 15px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        "
+                        > 关闭 </button>
+                        </center>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            """
+            page.evaluate(message_js_code)
+            page.evaluate("document.getElementById('customAlert2').style.display='block'")
+            # Wait for the 'alertClosed' attribute to appear on the body element
+            page.wait_for_selector("body[alertClosed='true']")
+            logger.info(f'Show finished messages')
+        except Exception as e:
             # Log exceptions or errors
             logger.error(f'Error occurred: {str(e)}')
-            root = tk.Tk()
-            root.withdraw()  # 隐藏主窗口，只显示弹窗
-            root.attributes("-topmost", True)
-            messagebox.showinfo("出现错误", f"{str(e)}")
-            root.destroy()  # 销毁弹窗
-    
-# if __name__ == "__main__":
-#     main()
+            # Show Finished messages
+            # Inject a styled message box into the page
+            message_js_code = """
+            () => {
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div id="customAlert3" style="
+                        position: fixed;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        padding: 20px;
+                        background-color: white;
+                        border: 2px solid black;
+                        z-index: 10000;
+                        display: none;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <h2>出现错误</h2>
+                        <p>错误为：{}</p>
+                        <center>
+                        <button onclick="document.getElementById('customAlert3').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
+                        style="
+                            padding: 10px 20px;
+                            font-size: 15px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        "
+                        > 关闭 </button>
+                        </center>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            """.format(str(e))
+            page.evaluate(message_js_code)
+            page.evaluate("document.getElementById('customAlert3').style.display='block'")
+            # Wait for the 'alertClosed' attribute to appear on the body element
+            page.wait_for_selector("body[alertClosed='true']")
+            logger.info(f'Show error messages')
+        # Shutdown
+        context.close()
+        browser.close()
+        logger.info('Completed successfully')
+
+if __name__ == "__main__":
+    taobao("2023-01-01", "2023-07-31")

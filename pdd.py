@@ -34,48 +34,32 @@ def setup_logger(log_file):
 
 
 
-def pdd():
+def pdd(start_date, end_date):
     # Initialize the logger
     current_date = datetime.now().strftime('%Y-%m-%d')
     logger = setup_logger(f'pdd_{current_date}.log')
 
     output_json = f"pdd_{current_date}.txt"
+    logger.info(f'chosen date range: {start_date} - {end_date}')
+
     def store_json(t):
         with open(output_json, "a", encoding="utf-8") as file:
             file.write("---\n")
             file.write(str(t))
+    
+    logger.info('Starting the program')
+    store_json(f'date_range: {start_date} - {end_date}')
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context()
+        page = context.new_page()
 
-    # Date management
-    # determine whether to scrape next-page
-    try:
-        # select date range in calendar
-        start_date, end_date = pick_dates()
-        root = tk.Tk()
-        root.withdraw()  # 隐藏主窗口，只显示弹窗
-        root.attributes("-topmost", True)
-        messagebox.showinfo("日期选择结果", f"开始日期：{start_date}\n结束日期：{end_date}")
-        logger.info(f'chosen date range: {start_date} - {end_date}')
-    except Exception as e:
-        logger.info(f'{str(e)}')
-        root = tk.Tk()
-        root.withdraw()  # 隐藏主窗口，只显示弹窗
-        root.attributes("-topmost", True)
-        messagebox.showinfo("错误", "日期有误!")
-        root.destroy()
+        # set default timeout
+        page.set_default_timeout(120000)
 
-    date_range = [int(datetime.strptime(start_date, "%Y-%m-%d").strftime("%y%m%d")), int(datetime.strptime(end_date, "%Y-%m-%d").strftime("%y%m%d"))]
-    print(f"==>> date_range: {date_range}")
-    # Main program
-    try:
-        logger.info('Starting the program')
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
-            context = browser.new_context()
-            page = context.new_page()
-
-            # set default timeout
-            page.set_default_timeout(120000)
-
+        # Main program
+        try:
+            date_range = [start_date, end_date]
             # Attach an event listener to the response event
             def handle_response(response):
                 url = response.url
@@ -102,16 +86,54 @@ def pdd():
                         else:
                             store_json(f'{url}\n')
                             store_json(json_data)
-                
+
+            # Step 0: Show Instructions
+            # Inject a styled message box into the page
+            message_js_code = """
+            () => {
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div id="customAlert1" style="
+                        position: fixed;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        padding: 20px;
+                        background-color: white;
+                        border: 2px solid black;
+                        z-index: 10000;
+                        display: none;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <h2>开始自动化操作</h2>
+                        <p>我们将自动为您打开拼多多网页，由于拼多多不提供扫码登录，因此请通过您的账号绑定的手机进行验证码登录!<b>（如果您还没有绑定过您的手机号，请先绑定）</b></p>
+                        <p>如果您理解了这一步操作，请点击下方的确定按钮。</p>
+                        <center>
+                        <button onclick="document.getElementById('customAlert1').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
+                        style="
+                            padding: 10px 20px;
+                            font-size: 15px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        "
+                        > 确定 </button>
+                        </center>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            """
+            page.evaluate(message_js_code)
+            page.evaluate("document.getElementById('customAlert1').style.display='block'")
+            # Wait for the 'alertClosed' attribute to appear on the body element
+            page.wait_for_selector("body[alertClosed='true']")
+            logger.info('Showed message popup')
+
 
             # Step 1: Open the link and login
-            # pop up message
-            root = tk.Tk()
-            root.withdraw()  # 隐藏主窗口，只显示弹窗
-            root.attributes("-topmost", True)
-            messagebox.showinfo("开始操作", "我们将自动为您打开拼多多网页，请通过手机验证码登录!")
-            root.destroy()
-            logger.info('Showed message popup')
             # open link and wait until page loaded
             page.goto('https://mobile.yangkeduo.com/orders.html')
             page.wait_for_load_state()
@@ -120,9 +142,6 @@ def pdd():
             page.wait_for_selector('._13OAwPyA', state="visible")
             logger.info('Go to orders page')
 
-            # def parse_json():
-            #     with open(output_json, "r", encoding="utf-8") as file:
-            #         return json.loads(file.read())
             def parse_order(orders):
                 detail_list = []
                 # Using .get() to avoid KeyError if 'ordersStore' or 'orders' is missing
@@ -195,27 +214,99 @@ def pdd():
             #         prev_height = curr_height
             #         time.sleep(10)
             
-
-            context.close()
-            browser.close()
-            logger.info('Closed the browser')
-
-            root = tk.Tk()
-            root.withdraw()  # 隐藏主窗口，只显示弹窗
-            root.attributes("-topmost", True)
-            messagebox.showinfo("完成", "数据已经收集完毕!")
-            root.destroy()
+            message_js_code = """
+            () => {
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div id="customAlert2" style="
+                        position: fixed;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        padding: 20px;
+                        background-color: white;
+                        border: 2px solid black;
+                        z-index: 10000;
+                        display: none;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 15px;
+                    ">
+                        <h2>结束程序</h2>
+                        <br>
+                        <p>数据收集完成，感谢您的使用！如果要收集其他平台的数据，请重新打开软件</p>
+                        <center>
+                        <button onclick="document.getElementById('customAlert2').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
+                        style="
+                            padding: 10px 20px;
+                            font-size: 15px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        "
+                        > 关闭 </button>
+                        </center>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            """
+            page.evaluate(message_js_code)
+            page.evaluate("document.getElementById('customAlert2').style.display='block'")
+            # Wait for the 'alertClosed' attribute to appear on the body element
+            page.wait_for_selector("body[alertClosed='true']")
             logger.info('Showed finished message')
 
-        logger.info('Completed successfully')
-    except Exception as e:
+        
+        except Exception as e:
             # Log exceptions or errors
             logger.error(f'Error occurred: {str(e)}')
-            root = tk.Tk()
-            root.withdraw()  # 隐藏主窗口，只显示弹窗
-            root.attributes("-topmost", True)
-            messagebox.showinfo("出现错误", f"{str(e)}")
-            root.destroy()  # 销毁弹窗
+            message_js_code = """
+            () => {
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div id="customAlert3" style="
+                        position: fixed;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        padding: 20px;
+                        background-color: white;
+                        border: 2px solid black;
+                        z-index: 10000;
+                        display: none;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <h2>出现错误</h2>
+                        <p>错误为：{}</p>
+                        <center>
+                        <button onclick="document.getElementById('customAlert3').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
+                        style="
+                            padding: 10px 20px;
+                            font-size: 15px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        "
+                        > 关闭 </button>
+                        </center>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            """.format(str(e))
+            page.evaluate(message_js_code)
+            page.evaluate("document.getElementById('customAlert3').style.display='block'")
+            # Wait for the 'alertClosed' attribute to appear on the body element
+            page.wait_for_selector("body[alertClosed='true']")
+
+        context.close()
+        browser.close()
+        logger.info('Closed the browser')
+        logger.info('Completed successfully')
     
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    pdd("2023-01-01", "2023-07-31")
