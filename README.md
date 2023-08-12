@@ -16,16 +16,16 @@ python -m venv env
 
 It creates the `venv` with name = env. Please **activate the env in terminal**. 
 
-Now install pre-requisites listed in `requirements.txt`.
+Now install pre-requisites:
 
-```
-pip install requirements.txt
+```powershell
+pip install playwright pyqt5 pyqt5-tools bs4 logging pyinstaller
 ```
 
 Here we should set up more in playwright, run this in terminal:
 
 ```
-playwright install
+python -m playwright install
 ```
 
 ## Make your own app with Pyinstaller
