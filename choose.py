@@ -1,3 +1,4 @@
+# coding = UTF-8
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QDesktopWidget, QVBoxLayout, QWidget, QMessageBox
 from PyQt5.QtGui import QFont
