@@ -30,27 +30,11 @@ playwright install
 
 ## Pyinstaller
 
-After activate venv in terminal, run this in terminal:
+After activate `venv` in terminal, run this in terminal:
 ```
 $env:PLAYWRIGHT_BROWSERS_PATH="0" 
 playwright install chromium
-pyinstaller --specpath ./. -n choose -F choose_gui.py
-```
-
-Then you will find a `choose.spec` file, now open it and find the line:
-```c
-hiddenimports=[],
-```
-
-We should add the text to the list, make sure it looks like:
-```c
-hiddenimports=["babel.numbers"],
-```
-
-Store and close the `choose.spec` file.  Now run this in terminal:
-
-```
-pyinstaller choose.spec
+pyinstaller -n choose -F --noconsole choose.py
 ```
 
 ## Test it
