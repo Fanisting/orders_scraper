@@ -58,21 +58,21 @@ class ECommerceWindow(QMainWindow):
 
     def run_taobao(self):
         self.close()
-        self.show_finish_message("淘宝/天猫")
-        app.exit()
+        # self.show_finish_message("淘宝/天猫")
+        app.quit()
         taobao(start_date, end_date)
         
     def run_jd(self):
         self.close()
-        self.show_finish_message("京东")
-        app.exit()
+        # self.show_finish_message("京东")
+        app.quit()
         jd(start_date, end_date)
 
         
     def run_pdd(self):
         self.close()
-        self.show_finish_message("拼多多")
-        app.exit()
+        # self.show_finish_message("拼多多")
+        app.quit()
         pdd(start_date, end_date)
 
 
@@ -91,9 +91,10 @@ if __name__ == "__main__":
 
     # Select date range
     window = DateRangeSelector()
-    window.show()
     window.resize(600, 300)
+    window.show()
     app.exec_()
+
     start_date, end_date = window.pick_dates()
     
     # Message about chosen date

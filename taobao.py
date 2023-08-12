@@ -64,7 +64,8 @@ def taobao(start_date, end_date):
                         justify-content: center;
                     ">
                         <h2>开始自动化操作</h2>
-                        <p>我们将自动为您打开淘宝的登录界面，请打开您手机上的淘宝软件，并使用软件内部的扫码功能来登录您的账号!</p>
+                        <p>我们将自动为您打开淘宝的登录界面，请打开您手机上的淘宝软件，并使用软件内部的扫码功能来登录您的账号!(当然，您也可以通过账号密码/手机验证码/支付宝扫码等其他方式登录)</p>
+                        <p>登录完成后，程序会自动操作，请不要使用鼠标和键盘，直到出现完成消息提示！</p>
                         <p>如果您理解了这一步操作，请点击下方的确定按钮。</p>
                         <center>
                         <button onclick="document.getElementById('customAlert1').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 

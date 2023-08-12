@@ -1,14 +1,7 @@
 from playwright.sync_api import sync_playwright
-from pathlib import Path
 import time
-import os
-import sys
 from datetime import datetime
 import logging
-import tkinter as tk
-from tkinter import messagebox
-from date_picker import pick_dates
-import json 
 import threading
 
 
@@ -110,6 +103,7 @@ def pdd(start_date, end_date):
                     ">
                         <h2>开始自动化操作</h2>
                         <p>我们将自动为您打开拼多多网页，由于拼多多不提供扫码登录，因此请通过您的账号绑定的手机进行验证码登录!<b>（如果您还没有绑定过您的手机号，请先绑定）</b></p>
+                        <p>登录完成后，程序会自动操作，请不要使用鼠标和键盘，直到出现完成消息提示！</p>
                         <p>如果您理解了这一步操作，请点击下方的确定按钮。</p>
                         <center>
                         <button onclick="document.getElementById('customAlert1').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 

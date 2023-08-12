@@ -58,7 +58,8 @@ def jd(start_date, end_date):
                         justify-content: center;
                     ">
                         <h2>开始自动化操作</h2>
-                        <p>我们将自动为您打开京东的登录界面，请打开您手机上的京东软件，并使用软件内部的扫码功能来登录您的账号!</p>
+                        <p>我们将自动为您打开京东的登录界面，请打开您手机上的京东软件，并使用软件内部的扫码功能来登录您的账号!（当然，您也可以选择微信扫码等其他方式登录）</p>
+                        <p>登录完成后，程序会自动操作，请不要使用鼠标和键盘，直到出现完成消息提示！</p>
                         <p>如果您理解了这一步操作，请点击下方的确定按钮。</p>
                         <center>
                         <button onclick="document.getElementById('customAlert1').style.display='none'; document.body.setAttribute('alertClosed', 'true');" 
@@ -104,19 +105,47 @@ def jd(start_date, end_date):
                 element = page.locator('div[id="order02"]')
                 html_content = element.inner_html()
                 file.write(html_content)
+            def check_first_page(end_date):
+                try:
+                    span_dealtime = page.query_selector('span.dealtime')
+                    if span_dealtime is None:
+                        return "stop"
+
+                    last_item_text = span_dealtime.inner_text().split(" ")[0]
+                    last_item_date = datetime.strptime(last_item_text, '%Y-%m-%d')
+
+                    end_date_parsed = datetime.strptime(end_date, '%Y-%m-%d')
+
+                    if last_item_date < end_date_parsed:
+                        return "stop"
+                    else:
+                        return "continue"
+                except Exception as e:
+                    logger.info(f'Error in check_first_page: {str(e)}')
+                    return "stop"              
              
             output_html = f"jingdong_{current_date}.html"
             with open(output_html, "w", encoding="utf-8") as file:
                 file.write(f"date range: {start_date} - {end_date}")
+
+                # Store 1st page
                 store_html()
+
+                # Update stop logic
                 link = update_next_link()
+                first_page_stop = check_first_page(end_date)
+                if first_page_stop == "stop":
+                    link = "stop"
+
                 while link != "stop":
                     page.goto(link)
                     page.wait_for_load_state()
                     store_html()
                     link = update_next_link()
-            
-
+                    first_page_stop = check_first_page(end_date)
+                    if first_page_stop == "stop":
+                        link = "stop"
+        
             # Delete people profile privacy
             with open(output_html, "r", encoding="utf-8") as file:
                 soup = BeautifulSoup(file, 'lxml')
