@@ -36,9 +36,9 @@ def date_string_to_int(date_str):
 def pdd(start_date, end_date):
     # Initialize the logger
     current_date = datetime.now().strftime('%Y-%m-%d')
-    logger = setup_logger(f'pdd_{current_date}.log')
+    logger = setup_logger(f'数据结果/pdd_{current_date}.log')
 
-    output_json = f"pdd_{current_date}.txt"
+    output_json = f"数据结果/pdd_{current_date}.txt"
     logger.info(f'chosen date range: {start_date} - {end_date}')
 
     def store_json(t):

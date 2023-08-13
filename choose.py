@@ -1,5 +1,6 @@
 # coding = UTF-8
 import sys
+from pathlib import Path
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QDesktopWidget, QVBoxLayout, QWidget, QMessageBox
 from PyQt5.QtGui import QFont
 # run platform
@@ -86,6 +87,12 @@ class ECommerceWindow(QMainWindow):
         msg_box.exec_()
 
 if __name__ == "__main__":
+
+    # Create the Store path
+    folder_path = Path("数据结果")
+    if not folder_path.exists():
+        folder_path.mkdir()
+
     # Init the app
     app = QApplication(sys.argv)
 

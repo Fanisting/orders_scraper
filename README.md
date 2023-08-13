@@ -14,7 +14,7 @@ Set up a virtual env with `python venv`. Run this in terminal:
 python -m venv env
 ```
 
-It creates the `venv` with name = env. Please **activate the env in terminal**. 
+It creates the `venv` with name = env. Please **activate the env in terminal**.
 
 Now install pre-requisites:
 
@@ -48,5 +48,9 @@ PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
 pyinstaller -n choose -F --windowed choose.py
 ```
 
-You will find the compiled app in `dist/` folder, try to run it. 
+You will find the compiled app in `dist/` folder, try to run it.
 
+
+## Output
+
+Once you run the app and choose a platform, you will find a `.html/.txt` file in local folder.

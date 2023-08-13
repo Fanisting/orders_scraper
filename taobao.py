@@ -26,7 +26,7 @@ def taobao(start_date, end_date):
 
     # Initialize the logger
     current_date = datetime.now().strftime('%Y-%m-%d')
-    logger = setup_logger(f'taobao_{current_date}.log')
+    logger = setup_logger(f'数据结果/taobao_{current_date}.log')
 
     logger.info('Starting the program')
     # Main program
@@ -203,7 +203,7 @@ def taobao(start_date, end_date):
 
                 return None
             
-            output_html = f"taobao_{current_date}.html"
+            output_html = f"数据结果/taobao_{current_date}.html"
 
             def store_html():
                 element = page.locator('div[id="tp-bought-root"]')

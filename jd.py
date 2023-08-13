@@ -24,7 +24,7 @@ def setup_logger(log_file):
 def jd(start_date, end_date):
     # Initialize the logger
     current_date = datetime.now().strftime('%Y-%m-%d')
-    logger = setup_logger(f'jingdong_{current_date}.log')
+    logger = setup_logger(f'数据结果/jingdong_{current_date}.log')
 
     logger.info('Starting the program')
     with sync_playwright() as p:
@@ -124,7 +124,7 @@ def jd(start_date, end_date):
                     logger.info(f'Error in check_first_page: {str(e)}')
                     return "stop"              
              
-            output_html = f"jingdong_{current_date}.html"
+            output_html = f"数据结果/jingdong_{current_date}.html"
             with open(output_html, "w", encoding="utf-8") as file:
                 file.write(f"date range: {start_date} - {end_date}")
 
