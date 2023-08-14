@@ -64,21 +64,22 @@ class ECommerceWindow(QMainWindow):
     def run_taobao(self):
         self.close()
         # self.show_finish_message("淘宝/天猫")
-        app.quit()
-        taobao(start_date, end_date)
+        qApp.quit()
+        taobao(self.start_date, self.end_date)
+
         
     def run_jd(self):
         self.close()
         # self.show_finish_message("京东")
-        app.quit()
-        jd(start_date, end_date)
+        qApp.quit()
+        jd(self.start_date, self.end_date)
 
         
     def run_pdd(self):
         self.close()
         # self.show_finish_message("拼多多")
-        app.quit()
-        pdd(start_date, end_date)
+        qApp.quit()
+        pdd(self.start_date, self.end_date)
 
 
     def show_finish_message(self, platform):
@@ -90,8 +91,7 @@ class ECommerceWindow(QMainWindow):
             msg_box.setText(f"我们将自动为您打开{platform}的登录界面\n请使用您拼多多账号绑定的手机号进行登录！（如果您还未绑定手机号,请先绑定）")
         msg_box.exec_()
 
-if __name__ == "__main__":
-
+def main():
     # Create the Store path
     folder_path = Path("数据结果")
     if not folder_path.exists():
@@ -118,5 +118,8 @@ if __name__ == "__main__":
     window = ECommerceWindow(start_date, end_date)
     window.show()
     app.exec_()
+
+if __name__ == "__main__":
+    main()
 
     
