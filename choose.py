@@ -1,8 +1,12 @@
+#!/env/Scripts python3.10
 # coding = UTF-8
 import sys
 from pathlib import Path
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QDesktopWidget, QVBoxLayout, QWidget, QMessageBox
-from PyQt5.QtGui import QFont
+from PySide2.QtWidgets import (QApplication, QMainWindow, QPushButton, QDesktopWidget, QVBoxLayout, 
+                               QWidget, QMessageBox)
+from PySide2.QtGui import QFont
+# from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QDesktopWidget, QVBoxLayout, QWidget, QMessageBox
+# from PyQt5.QtGui import QFont
 # run platform
 from taobao import taobao
 from jd import jd

@@ -1,6 +1,6 @@
 import sys
 import datetime
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QWidget, QLabel, QComboBox, QHBoxLayout, QMessageBox
+from PySide2.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QWidget, QLabel, QComboBox, QHBoxLayout, QMessageBox
 
 class DateRangeSelector(QMainWindow):
     def __init__(self):
